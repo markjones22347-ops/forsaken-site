@@ -1,0 +1,23 @@
+.auth-modal { max-width: 380px; }
+.auth-tabs {
+  display: flex; gap: 4px; margin-bottom: 24px;
+  background: var(--surface3); border-radius: 10px; padding: 4px;
+}
+.auth-tabs button {
+  flex: 1; padding: 8px; border: none; background: none;
+  color: var(--text-dim); font-size: 14px; font-weight: 600;
+  border-radius: 8px; cursor: pointer; transition: all var(--transition);
+  font-family: inherit;
+}
+.auth-tabs button.active {
+  background: var(--surface2); color: var(--green);
+  box-shadow: 0 0 12px rgba(0,230,118,0.1);
+}
+.auth-switch {
+  text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-dim);
+}
+.auth-switch button {
+  background: none; border: none; color: var(--green);
+  cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit;
+}
+.auth-switch button:hover { text-decoration: underline; }

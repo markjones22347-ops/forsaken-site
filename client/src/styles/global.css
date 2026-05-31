@@ -1,0 +1,120 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green:        #00e676;
+  --green-dim:    #00c853;
+  --green-dark:   #00701e;
+  --black:        #080808;
+  --surface:      #0f0f0f;
+  --surface2:     #161616;
+  --surface3:     #1e1e1e;
+  --border:       rgba(0,230,118,0.12);
+  --border-hover: rgba(0,230,118,0.30);
+  --text:         #f0f0f0;
+  --text-dim:     #888;
+  --radius:       12px;
+  --radius-lg:    18px;
+  --transition:   0.2s ease;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--black);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Cursor gradient background */
+#root {
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--green-dark); border-radius: 3px; }
+
+/* Utility */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 10px 22px; border-radius: var(--radius);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  border: none; transition: all var(--transition); text-decoration: none;
+}
+.btn-primary {
+  background: var(--green); color: #000;
+}
+.btn-primary:hover { background: var(--green-dim); transform: translateY(-1px); box-shadow: 0 0 20px rgba(0,230,118,0.3); }
+.btn-ghost {
+  background: transparent; color: var(--text); border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--border-hover); color: var(--green); }
+.btn-danger { background: #c62828; color: #fff; }
+.btn-danger:hover { background: #b71c1c; }
+
+/* Card */
+.card {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.card:hover { border-color: var(--border-hover); box-shadow: 0 0 30px rgba(0,230,118,0.06); }
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; backdrop-filter: blur(4px);
+  animation: fadeIn 0.15s ease;
+}
+.modal {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 32px; width: 100%; max-width: 420px;
+  animation: slideUp 0.2s ease;
+}
+.modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+
+/* Form */
+.form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.form-group label { font-size: 13px; color: var(--text-dim); font-weight: 500; }
+.form-group input {
+  background: var(--surface3); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 14px; color: var(--text);
+  font-size: 14px; font-family: inherit; outline: none;
+  transition: border-color var(--transition);
+}
+.form-group input:focus { border-color: var(--green); }
+.form-error { color: #ef5350; font-size: 13px; margin-top: -8px; margin-bottom: 8px; }
+.form-success { color: var(--green); font-size: 13px; margin-top: -8px; margin-bottom: 8px; }
+
+/* Spoiler */
+.spoiler {
+  background: var(--surface3); border-radius: 6px; padding: 2px 8px;
+  cursor: pointer; user-select: none; font-family: monospace; font-size: 13px;
+  filter: blur(4px); transition: filter 0.2s;
+}
+.spoiler.revealed { filter: none; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+/* Tag */
+.tag {
+  display: inline-block; padding: 2px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+}
+.tag-green { background: rgba(0,230,118,0.12); color: var(--green); }
+.tag-red   { background: rgba(239,83,80,0.12);  color: #ef5350; }
+.tag-dim   { background: var(--surface3); color: var(--text-dim); }
+
+/* Section */
+.section { padding: 100px 0; }
+.section-title { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+.section-sub   { color: var(--text-dim); font-size: 16px; margin-bottom: 48px; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }

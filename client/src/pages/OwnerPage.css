@@ -1,0 +1,153 @@
+/* Login page */
+.owner-login-page {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.owner-login-card {
+  max-width: 400px; width: 100%; text-align: center;
+  display: flex; flex-direction: column; gap: 16px; padding: 40px;
+}
+.owner-login-logo {
+  font-size: 22px; font-weight: 800; letter-spacing: 3px; color: var(--green);
+  margin-bottom: 4px;
+}
+.owner-login-card h2 { font-size: 22px; font-weight: 700; }
+.owner-login-card p  { font-size: 14px; color: var(--text-dim); line-height: 1.6; }
+.owner-discord-btn   { width: 100%; padding: 12px; font-size: 15px; gap: 10px; }
+
+/* Layout */
+.owner-page {
+  display: flex; min-height: 100vh;
+}
+.owner-sidebar {
+  width: 220px; flex-shrink: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; padding: 24px 16px;
+  position: sticky; top: 0; height: 100vh;
+}
+.owner-sidebar-logo {
+  font-size: 16px; font-weight: 800; letter-spacing: 2px;
+  color: var(--green); margin-bottom: 32px; padding: 0 8px;
+}
+.owner-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.owner-nav-btn {
+  background: none; border: none; color: var(--text-dim);
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  padding: 10px 12px; border-radius: 8px; text-align: left;
+  transition: all var(--transition); font-family: inherit;
+}
+.owner-nav-btn:hover  { background: var(--surface2); color: var(--text); }
+.owner-nav-btn.active { background: rgba(0,230,118,0.1); color: var(--green); font-weight: 600; }
+.owner-nav-btn.danger { color: #ef5350; }
+.owner-nav-btn.danger:hover  { background: rgba(239,83,80,0.1); }
+.owner-nav-btn.danger.active { background: rgba(239,83,80,0.12); color: #ef5350; }
+.owner-logout { margin-top: auto; width: 100%; }
+
+.owner-main { flex: 1; padding: 40px; overflow-y: auto; }
+
+/* Tab */
+.owner-tab { max-width: 1000px; }
+.owner-tab-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+}
+.owner-tab-header h2 { font-size: 22px; font-weight: 700; }
+.owner-tab-sub { font-size: 14px; color: var(--text-dim); line-height: 1.6; margin-bottom: 16px; }
+.owner-tab-sub code {
+  background: var(--surface3); padding: 1px 6px; border-radius: 4px;
+  font-size: 12px; color: var(--green);
+}
+
+/* Search */
+.owner-search {
+  width: 100%; max-width: 360px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 10px 14px; color: var(--text); font-size: 14px;
+  font-family: inherit; outline: none; margin-bottom: 20px;
+  transition: border-color var(--transition);
+}
+.owner-search:focus { border-color: var(--green); }
+
+/* Table */
+.keys-table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+.keys-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.keys-table th {
+  background: var(--surface2); padding: 12px 14px; text-align: left;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--text-dim);
+  border-bottom: 1px solid var(--border);
+}
+.keys-table td {
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.keys-table tr:last-child td { border-bottom: none; }
+.keys-table tr:hover td { background: rgba(255,255,255,0.02); }
+.key-code { font-family: monospace; font-size: 12px; color: var(--green); }
+.keys-empty { text-align: center; color: var(--text-dim); padding: 32px; }
+.text-dim { color: var(--text-dim); }
+
+.key-actions { display: flex; gap: 6px; }
+.btn-icon {
+  background: var(--surface3); border: 1px solid var(--border);
+  color: var(--text); border-radius: 6px; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 13px; transition: all var(--transition);
+}
+.btn-icon:hover { border-color: var(--green); color: var(--green); }
+.btn-icon-danger:hover { border-color: #ef5350; color: #ef5350; }
+
+/* Owner key id */
+.owner-key-id {
+  font-family: monospace; font-size: 13px; color: var(--green);
+  background: var(--surface3); padding: 6px 10px; border-radius: 6px;
+  margin-bottom: 20px; display: block;
+}
+
+/* Analytics */
+.analytics-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px;
+}
+.analytics-card {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; padding: 24px 16px; text-align: center;
+}
+.analytics-value { font-size: 36px; font-weight: 800; color: var(--green); }
+.analytics-label { font-size: 13px; color: var(--text-dim); }
+
+/* Danger */
+.danger-keys-form { max-width: 400px; margin-top: 24px; }
+.danger-section { margin-top: 8px; }
+.danger-section h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.danger-owners { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+.danger-owner-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 14px;
+}
+.danger-owner-row code { font-size: 13px; color: var(--text-dim); }
+.danger-add-owner { display: flex; gap: 10px; max-width: 400px; margin-top: 8px; }
+.danger-add-owner input {
+  flex: 1; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 14px; color: var(--text);
+  font-size: 14px; font-family: inherit; outline: none;
+}
+.danger-add-owner input:focus { border-color: var(--green); }
+
+/* Toast */
+.owner-toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  background: var(--surface2); border: 1px solid var(--green);
+  color: var(--green); padding: 12px 20px; border-radius: var(--radius);
+  font-size: 14px; font-weight: 600; animation: slideUp 0.2s ease;
+  box-shadow: 0 0 20px rgba(0,230,118,0.15);
+}
+
+/* Loading */
+.owner-loading { display: flex; justify-content: center; padding: 60px; }
+
+@media (max-width: 768px) {
+  .owner-page { flex-direction: column; }
+  .owner-sidebar { width: 100%; height: auto; position: static; flex-direction: row; flex-wrap: wrap; }
+  .owner-nav { flex-direction: row; flex-wrap: wrap; }
+  .owner-main { padding: 20px; }
+}
