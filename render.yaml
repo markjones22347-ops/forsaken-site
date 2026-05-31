@@ -2,7 +2,7 @@ services:
   - type: web
     name: forsaken-site
     env: node
-    buildCommand: npm install && npm run build
+    buildCommand: npm run build
     startCommand: npm run start
     envVars:
       - key: NODE_ENV
