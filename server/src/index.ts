@@ -110,6 +110,51 @@ app.get("/api/dashboard", requireSession, async (req, res) => {
   res.json({ username: sess.user.username, key: sess.user.key, record: rec, download_url: url });
 });
 
+// ── HWID reset request (customer → bot logs channel via Discord webhook) ──────
+app.post("/api/hwid-reset-request", requireSession, async (req, res) => {
+  const sess = (req.session as any);
+  if (sess.user.type !== "customer") return void res.status(403).json({ error: "Forbidden" });
+  const { reason } = req.body as { reason: string };
+  if (!reason?.trim()) return void res.status(400).json({ error: "Reason required." });
+
+  const LOGS_CHANNEL_ID = "1510458844524974233";
+  const BOT_TOKEN       = process.env.DISCORD_BOT_TOKEN || "";
+
+  if (!BOT_TOKEN) return void res.status(500).json({ error: "Bot token not configured." });
+
+  const message = {
+    content: `<@&1510455747711074514> <@&1510455933371940867> @everyone`,
+    embeds: [{
+      title: "HWID Reset Request",
+      color: 0x00e676,
+      fields: [
+        { name: "Username",   value: `\`${sess.user.username}\``, inline: true },
+        { name: "Key",        value: `\`${sess.user.key || "—"}\``, inline: true },
+        { name: "Reason",     value: reason.trim(), inline: false },
+      ],
+      footer: { text: "Forsaken — HWID Reset Request" },
+      timestamp: new Date().toISOString(),
+    }],
+  };
+
+  try {
+    const r = await fetch(`https://discord.com/api/v10/channels/${LOGS_CHANNEL_ID}/messages`, {
+      method:  "POST",
+      headers: { Authorization: `Bot ${BOT_TOKEN}`, "Content-Type": "application/json" },
+      body:    JSON.stringify(message),
+    });
+    if (!r.ok) {
+      const err = await r.text();
+      console.error("[HWID Request] Discord error:", err);
+      return void res.status(500).json({ error: "Failed to send to Discord." });
+    }
+    res.json({ ok: true });
+  } catch (e) {
+    console.error("[HWID Request] fetch error:", e);
+    res.status(500).json({ error: "Network error." });
+  }
+});
+
 // ── Owner — key management ────────────────────────────────────────────────────
 app.get("/api/owner/keys",           requireOwner, async (_req, res) => res.json(await getAllKeys()));
 app.delete("/api/owner/keys/:key",   requireOwner, async (req, res) => res.json({ ok: await deleteKey(req.params.key) }));
