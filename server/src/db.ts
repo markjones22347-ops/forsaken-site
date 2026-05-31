@@ -115,3 +115,21 @@ export async function authenticate(username: string, password: string, hwid?: st
   }
   return { success: false, message: "Username not found." };
 }
+
+export async function createKey(key: string, duration: string, generatedBy: number): Promise<KeyRecord> {
+  const db = await loadDB();
+  const record: KeyRecord = {
+    duration,
+    generated_by:       generatedBy,
+    generated_at:       now(),
+    disabled:           false,
+    claimed_by_discord: null,
+    username:           null,
+    password_hash:      null,
+    hwid:               null,
+    registered_at:      null,
+  };
+  db.keys[key] = record;
+  await saveDB(db);
+  return record;
+}
