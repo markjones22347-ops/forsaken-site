@@ -14,9 +14,9 @@ const FEATURES = [
 ];
 
 const PLANS = [
-  { jp: "週",  name: "Weekly",   sale: "$1.99",  regular: "$4.99",  period: "/ week",   note: "Try it out" },
-  { jp: "月",  name: "Monthly",  sale: "$4.99",  regular: "$8.99",  period: "/ month",  note: "Most popular", highlight: true },
-  { jp: "永",  name: "Lifetime", sale: "$6.99",  regular: "$14.99", period: "one-time", note: "Best value" },
+  { jp: "週",  name: "Weekly",   sale: "$1.99",  regular: "$4.99",  period: "/ week",   note: "Try it out",   highlight: false },
+  { jp: "永",  name: "Lifetime", sale: "$6.99",  regular: "$14.99", period: "one-time", note: "Most popular", highlight: true  },
+  { jp: "月",  name: "Monthly",  sale: "$4.99",  regular: "$8.99",  period: "/ month",  note: "Great value",  highlight: false },
 ];
 
 export default function HomePage() {
@@ -165,7 +165,7 @@ export default function HomePage() {
                 <button
                   className={`btn ${p.highlight ? "btn-primary" : "btn-ghost"}`}
                   style={{ width: "100%", marginTop: "auto" }}
-                  onClick={() => setShowAuth(true)}
+                  onClick={() => window.open("https://discord.gg/C9McPmd5", "_blank")}
                 >
                   Get {p.name}
                 </button>

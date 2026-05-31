@@ -9,7 +9,7 @@ dotenv.config();
 import {
   loadDB, getAllKeys, getKey, updateKey, deleteKey, resetHwid,
   registerKey, authenticate, getDownloadUrl, setDownloadUrl,
-  addOwner, removeOwner, getExtraOwners,
+  addOwner, removeOwner, getExtraOwners, createKey,
 } from "./db";
 import {
   getOAuthUrl, exchangeCode, getDiscordUser,
@@ -54,7 +54,8 @@ app.post("/api/auth/login", async (req, res) => {
   if (!result.success) return void res.status(401).json(result);
   const db  = await loadDB();
   const rec = result.key ? db.keys[result.key] : null;
-  (req.session as any).user = { type: "customer", username, key: result.key, record: rec };
+  // Store plaintext password in session so dashboard can show it as spoiler
+  (req.session as any).user = { type: "customer", username, password, key: result.key, record: rec };
   res.json({ success: true, username, key: result.key, record: rec });
 });
 
@@ -107,27 +108,25 @@ app.get("/api/dashboard", requireSession, async (req, res) => {
   const db  = await loadDB();
   const rec = sess.user.key ? db.keys[sess.user.key] : null;
   const url = await getDownloadUrl();
-  res.json({ username: sess.user.username, key: sess.user.key, record: rec, download_url: url });
+  res.json({
+    username:     sess.user.username,
+    password:     sess.user.password || null,   // plaintext from session
+    key:          sess.user.key,
+    record:       rec,
+    download_url: url,
+  });
 });
 
-// ── HWID reset request (customer → bot logs channel via Discord webhook) ──────
+// ── HWID reset request → Discord webhook ─────────────────────────────────────
 app.post("/api/hwid-reset-request", requireSession, async (req, res) => {
   const sess = (req.session as any);
   if (sess.user.type !== "customer") return void res.status(403).json({ error: "Forbidden" });
   const { reason } = req.body as { reason: string };
   if (!reason?.trim()) return void res.status(400).json({ error: "Reason required." });
 
-  const LOGS_CHANNEL_ID = "1510458844524974233";
-  const BOT_TOKEN       = process.env.DISCORD_BOT_TOKEN || "";
+  const WEBHOOK = "https://discord.com/api/webhooks/1510693978734067722/L3WO2-ka3t9NHXlOtk7RVtNGUkV1y_x826Mtpg1x0cQ_ykEaBWtCA9MnW9g03ebbBu3C";
 
-  if (!BOT_TOKEN) {
-    // Fallback: log to console so admins can see it even without token configured
-    console.log(`[HWID Request] User: ${sess.user.username} | Key: ${sess.user.key} | Reason: ${reason.trim()}`);
-    return void res.json({ ok: true });
-  }
-
-  const message = {
-    content: `<@&1510455747711074514> <@&1510455933371940867>`,
+  const payload = {
     embeds: [{
       title: "HWID Reset Request",
       color: 0xffffff,
@@ -142,27 +141,28 @@ app.post("/api/hwid-reset-request", requireSession, async (req, res) => {
   };
 
   try {
-    const r = await fetch(`https://discord.com/api/v10/channels/${LOGS_CHANNEL_ID}/messages`, {
-      method:  "POST",
-      headers: { Authorization: `Bot ${BOT_TOKEN}`, "Content-Type": "application/json" },
-      body:    JSON.stringify(message),
+    await fetch(WEBHOOK, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
-    if (!r.ok) {
-      const err = await r.text();
-      console.error("[HWID Request] Discord API error:", r.status, err);
-      // Still return ok — request was received, just couldn't notify Discord
-      return void res.json({ ok: true });
-    }
-    res.json({ ok: true });
   } catch (e) {
-    console.error("[HWID Request] fetch error:", e);
-    // Still return ok so user isn't blocked
-    res.json({ ok: true });
+    console.error("[HWID Webhook] error:", e);
   }
+  // Always return ok — request is logged regardless
+  res.json({ ok: true });
 });
 
 // ── Owner — key management ────────────────────────────────────────────────────
 app.get("/api/owner/keys",           requireOwner, async (_req, res) => res.json(await getAllKeys()));
+app.post("/api/owner/keys/generate", requireOwner, async (req, res) => {
+  const { key, duration, note } = req.body as { key: string; duration: string; note?: string };
+  if (!key || !duration) return void res.status(400).json({ error: "key and duration required" });
+  const db = await loadDB();
+  if (db.keys[key]) return void res.status(409).json({ error: "Key already exists" });
+  const record = await createKey(key, duration, 0);
+  res.json({ ok: true, key, record });
+});
 app.delete("/api/owner/keys/:key",   requireOwner, async (req, res) => res.json({ ok: await deleteKey(req.params.key) }));
 app.post("/api/owner/keys/:key/hwid-reset", requireOwner, async (req, res) => res.json({ ok: await resetHwid(req.params.key) }));
 app.patch("/api/owner/keys/:key",    requireOwner, async (req, res) => res.json({ ok: await updateKey(req.params.key, req.body) }));

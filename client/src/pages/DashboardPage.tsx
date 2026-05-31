@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import "./DashboardPage.css";
 
 interface DashData {
-  username: string; key: string; download_url: string;
+  username: string; key: string; download_url: string; password: string | null;
   record: { duration: string; disabled: boolean; registered_at: string | null; hwid: string | null; password_hash: string | null; } | null;
 }
 
@@ -190,7 +190,7 @@ export default function DashboardPage() {
               </h2>
               <div className="dash-table">
                 <div className="dash-row"><span>Username</span><span className="mono">{data.username}</span></div>
-                <div className="dash-row"><span>Password</span><Spoiler value="your-password" /></div>
+                <div className="dash-row"><span>Password</span><Spoiler value={data.password || "••••••••"} /></div>
                 <div className="dash-row"><span>Registered</span><span>{date}</span></div>
                 <div className="dash-row"><span>Status</span>
                   <span className={`tag ${rec?.disabled ? "tag-red" : "tag-white"}`}>
