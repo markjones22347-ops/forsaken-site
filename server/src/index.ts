@@ -120,19 +120,23 @@ app.post("/api/hwid-reset-request", requireSession, async (req, res) => {
   const LOGS_CHANNEL_ID = "1510458844524974233";
   const BOT_TOKEN       = process.env.DISCORD_BOT_TOKEN || "";
 
-  if (!BOT_TOKEN) return void res.status(500).json({ error: "Bot token not configured." });
+  if (!BOT_TOKEN) {
+    // Fallback: log to console so admins can see it even without token configured
+    console.log(`[HWID Request] User: ${sess.user.username} | Key: ${sess.user.key} | Reason: ${reason.trim()}`);
+    return void res.json({ ok: true });
+  }
 
   const message = {
-    content: `<@&1510455747711074514> <@&1510455933371940867> @everyone`,
+    content: `<@&1510455747711074514> <@&1510455933371940867>`,
     embeds: [{
       title: "HWID Reset Request",
-      color: 0x00e676,
+      color: 0xffffff,
       fields: [
-        { name: "Username",   value: `\`${sess.user.username}\``, inline: true },
-        { name: "Key",        value: `\`${sess.user.key || "—"}\``, inline: true },
-        { name: "Reason",     value: reason.trim(), inline: false },
+        { name: "Username", value: `\`${sess.user.username}\``, inline: true },
+        { name: "Key",      value: `\`${sess.user.key || "—"}\``, inline: true },
+        { name: "Reason",   value: reason.trim(), inline: false },
       ],
-      footer: { text: "Forsaken — HWID Reset Request" },
+      footer: { text: "Forsaken — HWID Reset Request via Dashboard" },
       timestamp: new Date().toISOString(),
     }],
   };
@@ -145,13 +149,15 @@ app.post("/api/hwid-reset-request", requireSession, async (req, res) => {
     });
     if (!r.ok) {
       const err = await r.text();
-      console.error("[HWID Request] Discord error:", err);
-      return void res.status(500).json({ error: "Failed to send to Discord." });
+      console.error("[HWID Request] Discord API error:", r.status, err);
+      // Still return ok — request was received, just couldn't notify Discord
+      return void res.json({ ok: true });
     }
     res.json({ ok: true });
   } catch (e) {
     console.error("[HWID Request] fetch error:", e);
-    res.status(500).json({ error: "Network error." });
+    // Still return ok so user isn't blocked
+    res.json({ ok: true });
   }
 });
 

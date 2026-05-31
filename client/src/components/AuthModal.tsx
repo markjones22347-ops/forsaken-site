@@ -1,164 +1,138 @@
 import { useState, useEffect } from "react";
 import "./AuthModal.css";
 
-interface AuthModalProps {
-  onClose: () => void;
-  onSuccess: () => void;
-}
-
+interface Props { onClose: () => void; onSuccess: () => void; }
 type Mode = "login" | "signup";
-
 const STORAGE_KEY = "forsaken_remember";
 
-export default function AuthModal({ onClose, onSuccess }: AuthModalProps) {
-  const [mode, setMode]         = useState<Mode>("login");
-  const [key, setKey]           = useState("");
+export default function AuthModal({ onClose, onSuccess }: Props) {
+  const [mode,     setMode]     = useState<Mode>("login");
+  const [key,      setKey]      = useState("");
   const [username, setUser]     = useState("");
   const [password, setPass]     = useState("");
   const [remember, setRemember] = useState(false);
-  const [error, setError]       = useState("");
-  const [success, setSuccess]   = useState("");
-  const [loading, setLoading]   = useState(false);
+  const [error,    setError]    = useState("");
+  const [info,     setInfo]     = useState("");
+  const [loading,  setLoading]  = useState(false);
 
-  // Load remembered credentials on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const { username: u, password: p } = JSON.parse(saved);
-        setUser(u || ""); setPass(p || ""); setRemember(true);
-      }
+      const s = localStorage.getItem(STORAGE_KEY);
+      if (s) { const d = JSON.parse(s); setUser(d.username||""); setPass(d.password||""); setRemember(true); }
     } catch {}
   }, []);
 
-  const reset = () => { setError(""); setSuccess(""); };
+  const reset = () => { setError(""); setInfo(""); };
 
-  const handleLogin = async () => {
+  const doLogin = async () => {
     setLoading(true); setError("");
     try {
-      const res  = await fetch("/api/auth/login", {
+      const r = await fetch("/api/auth/login", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-      const data = await res.json();
-      if (!data.success) { setError(data.message || "Login failed."); return; }
-      if (remember) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({ username, password }));
-      } else {
-        localStorage.removeItem(STORAGE_KEY);
-      }
+      const d = await r.json();
+      if (!d.success) { setError(d.message || "Login failed."); return; }
+      if (remember) localStorage.setItem(STORAGE_KEY, JSON.stringify({ username, password }));
+      else localStorage.removeItem(STORAGE_KEY);
       onSuccess();
-    } catch { setError("Network error. Check your connection."); }
+    } catch { setError("Network error."); }
     finally { setLoading(false); }
   };
 
-  const handleSignup = async () => {
+  const doSignup = async () => {
     if (!key || !username || !password) { setError("All fields are required."); return; }
     setLoading(true); setError("");
     try {
-      const res  = await fetch("/api/auth/register", {
+      const r = await fetch("/api/auth/register", {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key: key.toUpperCase(), username, password }),
       });
-      const data = await res.json();
-      if (!data.success) { setError(data.error || "Registration failed."); return; }
-      setSuccess("Account created! Logging you in…");
-      // Auto-login after signup
+      const d = await r.json();
+      if (!d.success) { setError(d.error || "Registration failed."); return; }
+      setInfo("Account created. Signing in…");
       setTimeout(async () => {
-        const r2   = await fetch("/api/auth/login", {
+        const r2 = await fetch("/api/auth/login", {
           method: "POST", credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),
         });
         const d2 = await r2.json();
-        if (d2.success) onSuccess();
-        else { setMode("login"); setKey(""); setSuccess(""); }
-      }, 800);
-    } catch { setError("Network error. Check your connection."); }
+        if (d2.success) onSuccess(); else { setMode("login"); setInfo(""); }
+      }, 600);
+    } catch { setError("Network error."); }
     finally { setLoading(false); }
   };
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal auth-modal">
+        {/* Close */}
+        <button className="auth-close" onClick={onClose} aria-label="Close">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/>
+          </svg>
+        </button>
 
-        {/* Close button */}
-        <button className="auth-close" onClick={onClose}>✕</button>
-
-        {/* Logo */}
-        <div className="auth-logo">FORSAKEN</div>
+        {/* Header */}
+        <div className="auth-header">
+          <svg width="24" height="24" viewBox="0 0 20 20" fill="none" className="auth-icon">
+            <rect x="1" y="1" width="18" height="18" stroke="white" strokeWidth="1"/>
+            <line x1="1" y1="10" x2="19" y2="10" stroke="white" strokeWidth="1"/>
+            <line x1="10" y1="1" x2="10" y2="19" stroke="white" strokeWidth="1"/>
+          </svg>
+          <span className="auth-wordmark">FORSAKEN</span>
+          <span className="auth-kanji">侵略</span>
+        </div>
 
         {/* Tabs */}
         <div className="auth-tabs">
-          <button className={mode === "login"  ? "active" : ""} onClick={() => { setMode("login");  reset(); }}>Log In</button>
-          <button className={mode === "signup" ? "active" : ""} onClick={() => { setMode("signup"); reset(); }}>Sign Up</button>
+          <button className={mode === "login"  ? "active" : ""} onClick={() => { setMode("login");  reset(); }}>Sign In</button>
+          <button className={mode === "signup" ? "active" : ""} onClick={() => { setMode("signup"); reset(); }}>Register</button>
         </div>
 
         {/* Fields */}
         {mode === "signup" && (
           <div className="form-group">
-            <label>License Key</label>
-            <input
-              placeholder="FORSAKEN-XXXX-XXXX-XXXX"
-              value={key}
-              onChange={e => setKey(e.target.value)}
-              maxLength={24}
-              autoComplete="off"
-            />
+            <label className="form-label">License Key</label>
+            <input className="form-input" placeholder="FORSAKEN-XXXX-XXXX-XXXX"
+              value={key} onChange={e => setKey(e.target.value)} maxLength={24} autoComplete="off" />
           </div>
         )}
-
         <div className="form-group">
-          <label>Username</label>
-          <input
-            placeholder="your username"
-            value={username}
-            onChange={e => setUser(e.target.value)}
-            autoComplete="username"
-          />
+          <label className="form-label">Username</label>
+          <input className="form-input" placeholder="username"
+            value={username} onChange={e => setUser(e.target.value)} autoComplete="username" />
         </div>
-
         <div className="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={e => setPass(e.target.value)}
+          <label className="form-label">Password</label>
+          <input className="form-input" type="password" placeholder="••••••••"
+            value={password} onChange={e => setPass(e.target.value)}
             autoComplete={mode === "login" ? "current-password" : "new-password"}
-            onKeyDown={e => e.key === "Enter" && (mode === "login" ? handleLogin() : handleSignup())}
-          />
+            onKeyDown={e => e.key === "Enter" && (mode === "login" ? doLogin() : doSignup())} />
         </div>
 
-        {/* Remember me (login only) */}
         {mode === "login" && (
           <label className="auth-remember">
-            <input
-              type="checkbox"
-              checked={remember}
-              onChange={e => setRemember(e.target.checked)}
-            />
-            Remember me
+            <input type="checkbox" checked={remember} onChange={e => setRemember(e.target.checked)} />
+            <span>Remember me</span>
           </label>
         )}
 
-        {error   && <p className="form-error">{error}</p>}
-        {success && <p className="form-success">{success}</p>}
+        {error && <p className="form-error">{error}</p>}
+        {info  && <p className="form-success">{info}</p>}
 
-        <button
-          className="btn btn-primary auth-submit"
-          disabled={loading}
-          onClick={mode === "login" ? handleLogin : handleSignup}
-        >
-          {loading ? <span className="auth-spinner" /> : mode === "login" ? "Log In" : "Create Account"}
+        <button className="btn btn-primary auth-submit" disabled={loading}
+          onClick={mode === "login" ? doLogin : doSignup}>
+          {loading ? <span className="auth-spinner" /> : mode === "login" ? "Sign In" : "Create Account"}
         </button>
 
         <p className="auth-switch">
-          {mode === "login" ? "Don't have an account? " : "Already have an account? "}
+          {mode === "login" ? "No account? " : "Have an account? "}
           <button onClick={() => { setMode(mode === "login" ? "signup" : "login"); reset(); }}>
-            {mode === "login" ? "Sign Up" : "Log In"}
+            {mode === "login" ? "Register" : "Sign In"}
           </button>
         </p>
       </div>
