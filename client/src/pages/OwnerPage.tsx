@@ -119,10 +119,11 @@ function KeysTab() {
     await saveKey(k, { disabled: !current });
   };
 
-  const filtered = Object.entries(keys).filter(([k, r]) =>
-    k.toLowerCase().includes(search.toLowerCase()) ||
-    (r.username ?? "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = Object.entries(keys).filter(([k, r]) => {
+    const rec = r as KeyRecord;
+    return k.toLowerCase().includes(search.toLowerCase()) ||
+      (rec.username ?? "").toLowerCase().includes(search.toLowerCase());
+  }) as [string, KeyRecord][];
 
   return (
     <div className="owner-tab">
@@ -247,9 +248,10 @@ function AnalyticsTab() {
   }, []);
 
   const total    = Object.keys(keys).length;
-  const claimed  = Object.values(keys).filter(r => r.claimed_by_discord !== null).length;
-  const disabled = Object.values(keys).filter(r => r.disabled).length;
-  const hwid     = Object.values(keys).filter(r => r.hwid !== null).length;
+  const vals     = Object.values(keys) as KeyRecord[];
+  const claimed  = vals.filter(r => r.claimed_by_discord !== null).length;
+  const disabled = vals.filter(r => r.disabled).length;
+  const hwid     = vals.filter(r => r.hwid !== null).length;
 
   const stats = [
     { label: "Total Keys",    value: total },
