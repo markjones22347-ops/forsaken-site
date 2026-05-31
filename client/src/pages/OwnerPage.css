@@ -86,15 +86,17 @@
 .keys-empty { text-align: center; color: var(--text-dim); padding: 32px; }
 .text-dim { color: var(--text-dim); }
 
-.key-actions { display: flex; gap: 6px; }
-.btn-icon {
+.key-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn-action {
   background: var(--surface3); border: 1px solid var(--border);
-  color: var(--text); border-radius: 6px; width: 28px; height: 28px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 13px; transition: all var(--transition);
+  color: var(--text); border-radius: 8px; padding: 6px 14px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  transition: all var(--transition); font-family: "Lexend", sans-serif;
+  white-space: nowrap;
 }
-.btn-icon:hover { border-color: var(--green); color: var(--green); }
-.btn-icon-danger:hover { border-color: #ef5350; color: #ef5350; }
+.btn-action:hover { border-color: var(--green); color: var(--green); background: rgba(0,230,118,0.06); }
+.btn-action-danger { color: #ef5350; border-color: rgba(239,83,80,0.3); }
+.btn-action-danger:hover { border-color: #ef5350; background: rgba(239,83,80,0.08); color: #ef5350; }
 
 /* Owner key id */
 .owner-key-id {

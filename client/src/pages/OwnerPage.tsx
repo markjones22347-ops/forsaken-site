@@ -18,10 +18,36 @@ type Tab = "keys" | "download" | "analytics" | "danger";
 
 // ── Spoiler ───────────────────────────────────────────────────────────────────
 function Spoiler({ value }: { value: string }) {
-  const [show, setShow] = useState(false);
+  const [show, setShow]   = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(value).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+
   return (
-    <span className={`spoiler ${show ? "revealed" : ""}`} onClick={() => setShow(v => !v)}>
-      {value}
+    <span className="spoiler-wrap">
+      <span className={`spoiler ${show ? "revealed" : ""}`} onClick={() => setShow(v => !v)}>
+        {value}
+      </span>
+      {show && (
+        <button className="spoiler-copy" onClick={copy} title="Copy">
+          {copied ? (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+          )}
+        </button>
+      )}
     </span>
   );
 }
@@ -182,13 +208,13 @@ function KeysTab() {
                   </td>
                   <td>
                     <div className="key-actions">
-                      <button className="btn-icon" title="Edit" onClick={() => setEditKey(k)}>✏</button>
-                      <button className="btn-icon" title={r.disabled ? "Enable" : "Disable"}
+                      <button className="btn-action" title="Edit" onClick={() => setEditKey(k)}>Edit</button>
+                      <button className="btn-action" title={r.disabled ? "Enable" : "Disable"}
                         onClick={() => toggleDisable(k, r.disabled)}>
-                        {r.disabled ? "▶" : "⏸"}
+                        {r.disabled ? "Enable" : "Disable"}
                       </button>
-                      <button className="btn-icon" title="Reset HWID" onClick={() => resetHwid(k)}>⟳</button>
-                      <button className="btn-icon btn-icon-danger" title="Delete" onClick={() => deleteKey(k)}>✕</button>
+                      <button className="btn-action" title="Reset HWID" onClick={() => resetHwid(k)}>Reset HWID</button>
+                      <button className="btn-action btn-action-danger" title="Delete" onClick={() => deleteKey(k)}>Delete</button>
                     </div>
                   </td>
                 </tr>
